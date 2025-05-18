@@ -23058,6 +23058,40 @@
       console.warn('Element with id "scroll" not found');
       return;
     }
+    const bubbles = [
+      { num: 1, top: 59, left: 79 },
+      { num: 2, top: 90, left: 322 },
+      { num: 3, top: 188, left: 523 },
+      { num: 4, top: 239, left: 127 },
+      { num: 5, top: 449, left: 104 },
+      { num: 6, top: 608, left: 332 },
+      { num: 7, top: 707, left: 147 },
+      { num: 8, top: 722, left: 520 },
+      { num: 9, top: 75, left: 721 },
+      { num: 10, top: 210, left: 870 },
+      { num: 11, top: 594, left: 675 },
+      { num: 12, top: 732, left: 885 },
+      { num: 13, top: 564, left: 1060 },
+      { num: 14, top: 91, left: 1308 },
+      { num: 15, top: 206, left: 1472 },
+      { num: 16, top: 271, left: 1305 },
+      { num: 17, top: 379, left: 1447 },
+      { num: 18, top: 641, left: 1232 },
+      { num: 19, top: 721, left: 1449 }
+    ];
+    bubbles.forEach(({ num, top, left }) => {
+      const el = document.querySelector(`[bubble-number="${num}"]`);
+      if (!el) return;
+      el.style.position = "absolute";
+      el.style.left = `${left}px`;
+      const startTop = top + (Math.random() * 200 - 100);
+      el.style.top = `${startTop}px`;
+      gsapWithCSS.to(el, {
+        top,
+        duration: 1.5,
+        ease: "power2.out"
+      });
+    });
     let lottieAnimation = null;
     const lottieElement = document.getElementById("section-lottie");
     if (lottieElement) {
@@ -23093,12 +23127,18 @@
         }
       }
     }
+    const bubblesContainer = document.getElementById("bubbles");
+    if (!bubblesContainer) {
+      console.warn('Element with id "bubbles" not found');
+    }
     ScrollTrigger2.create({
       trigger: "#scroll",
       start: "top top",
       end: "bottom bottom",
       markers: false,
       // Set to true during development
+      scrub: 0.5,
+      // Smoothing factor for animation (adds slight delay for smoother effect)
       onUpdate: (self2) => {
         const firstAnimProgress = 0.25;
         const secondAnimProgress = 0.5;
@@ -23166,30 +23206,28 @@
         } else if (lottieAnimation && self2.progress > lottieAnimProgress) {
           lottieAnimation.goToAndStop(lottieAnimation.totalFrames - 1, true);
         }
-        const bubblesAnimStart = lottieAnimProgress;
-        const bubblesAnimEnd = 1;
-        if (self2.progress >= bubblesAnimStart && self2.progress <= bubblesAnimEnd) {
-          const bubblesProgress = (self2.progress - bubblesAnimStart) / (bubblesAnimEnd - bubblesAnimStart);
-          const opacity = Math.min(1, bubblesProgress * 3);
-          const yPosition = gsapWithCSS.utils.interpolate(100, 0, bubblesProgress);
-          gsapWithCSS.set("#bubbles", {
-            opacity,
-            y: `${yPosition}%`
-          });
-        } else if (self2.progress < bubblesAnimStart) {
-          gsapWithCSS.set("#bubbles", {
-            opacity: 0,
-            y: "100%"
-          });
-        } else {
-          gsapWithCSS.set("#bubbles", {
-            opacity: 1,
-            y: "0%"
-          });
+        if (bubblesContainer) {
+          if (self2.progress >= lottieAnimProgress) {
+            const bubbleProgress = (self2.progress - lottieAnimProgress) / (1 - lottieAnimProgress);
+            const opacity = Math.min(1, bubbleProgress * 3);
+            const yPosition = 100 * (1 - Math.pow(bubbleProgress, 0.33));
+            gsapWithCSS.set(bubblesContainer, {
+              opacity,
+              y: `${yPosition}%`
+            });
+            if (bubbleProgress > 0.99) {
+              console.log("Final bubble position:", yPosition);
+            }
+          } else {
+            gsapWithCSS.set(bubblesContainer, {
+              opacity: 0,
+              y: "100%"
+            });
+          }
         }
       }
     });
-    console.log("Scroll animations initialized for #scroll with Lottie animation and word-by-word text reveal");
+    console.log("Scroll animations initialized for #scroll with Lottie animation, word-by-word text reveal, and bubble animation after Lottie (parallax removed)");
   }
 
   // src/utils/fadeAnimations.ts

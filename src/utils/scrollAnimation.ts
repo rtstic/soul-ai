@@ -18,6 +18,49 @@ function initScrollAnimation(): void {
     return;
   }
 
+  // Initialize bubble parallax data
+  const bubbles = [
+    { num: 1, top: 59, left: 79 },
+    { num: 2, top: 90, left: 322 },
+    { num: 3, top: 188, left: 523 },
+    { num: 4, top: 239, left: 127 },
+    { num: 5, top: 449, left: 104 },
+    { num: 6, top: 608, left: 332 },
+    { num: 7, top: 707, left: 147 },
+    { num: 8, top: 722, left: 520 },
+    { num: 9, top: 75, left: 721 },
+    { num: 10, top: 210, left: 870 },
+    { num: 11, top: 594, left: 675 },
+    { num: 12, top: 732, left: 885 },
+    { num: 13, top: 564, left: 1060 },
+    { num: 14, top: 91, left: 1308 },
+    { num: 15, top: 206, left: 1472 },
+    { num: 16, top: 271, left: 1305 },
+    { num: 17, top: 379, left: 1447 },
+    { num: 18, top: 641, left: 1232 },
+    { num: 19, top: 721, left: 1449 },
+  ];
+
+  // Initialize bubble positions with random offsets
+  bubbles.forEach(({ num, top, left }) => {
+    const el = document.querySelector(`[bubble-number="${num}"]`);
+    if (!el) return;
+    
+    el.style.position = 'absolute';
+    el.style.left = `${left}px`;
+    
+    // Set random start top position
+    const startTop = top + (Math.random() * 200 - 100); // ±100px random offset
+    el.style.top = `${startTop}px`;
+    
+    // Animate to target top
+    gsap.to(el, {
+      top: top,
+      duration: 1.5,
+      ease: 'power2.out',
+    });
+  });
+
   // Initialize Lottie animation
   let lottieAnimation: ReturnType<typeof lottie.loadAnimation> | null = null;
   
@@ -75,12 +118,19 @@ function initScrollAnimation(): void {
     }
   }
 
+  // Get the bubbles container
+  const bubblesContainer: HTMLElement | null = document.getElementById('bubbles');
+  if (!bubblesContainer) {
+    console.warn('Element with id "bubbles" not found');
+  }
+
   // Create a ScrollTrigger for the sequence of animations
   ScrollTrigger.create({
     trigger: '#scroll',
     start: 'top top',
     end: 'bottom bottom',
     markers: false, // Set to true during development
+    scrub: 0.5, // Smoothing factor for animation (adds slight delay for smoother effect)
     onUpdate: (self): void => {
       // Define progress thresholds for each animation
       const firstAnimProgress: number = 0.25; // When first animation completes
@@ -186,45 +236,45 @@ function initScrollAnimation(): void {
         lottieAnimation.goToAndStop(lottieAnimation.totalFrames - 1, true);
       }
 
-
-      // After your Lottie animation code, add this new section:
-// Define progress thresholds for the bubbles animation
-const bubblesAnimStart: number = lottieAnimProgress; // Start right after Lottie animation completes
-const bubblesAnimEnd: number = 1.0; // End at the very bottom of the scroll
-
-// Bubbles animation: fade in and move from 50% to 100% y position
-if (self.progress >= bubblesAnimStart && self.progress <= bubblesAnimEnd) {
-  // Map progress from bubblesAnimStart-bubblesAnimEnd to 0-1 for the animation
-  const bubblesProgress: number = (self.progress - bubblesAnimStart) / (bubblesAnimEnd - bubblesAnimStart);
-  
-  // Calculate opacity (0 to 1) - fade in quickly at the beginning
-  const opacity: number = Math.min(1, bubblesProgress * 3); // Fade in 3x faster
-  
-  // Calculate y position (50% to 100%)
-  const yPosition: number = gsap.utils.interpolate(100, 0, bubblesProgress);
-  
-  // Apply transformations
-  gsap.set('#bubbles', { 
-    opacity: opacity,
-    y: `${yPosition}%`
-  });
-} else if (self.progress < bubblesAnimStart) {
-  // Ensure initial state before the animation starts
-  gsap.set('#bubbles', { 
-    opacity: 0,
-    y: '100%'
-  });
-} else {
-  // Ensure final state after the animation completes
-  gsap.set('#bubbles', { 
-    opacity: 1,
-    y: '0%'
-  });
-}
+      // Bubbles container animation: only starts after the Lottie animation
+      // and continues until the end of the scroll, with slower movement to fill the entire remaining scroll
+      if (bubblesContainer) {
+        if (self.progress >= lottieAnimProgress) {
+          // Map progress from lottieAnimProgress-1.0 to 0-1 for the animation
+          const bubbleProgress: number = (self.progress - lottieAnimProgress) / (1 - lottieAnimProgress);
+          
+          // Calculate opacity (0 to 1) - fade in quickly at the beginning of this section
+          const opacity: number = Math.min(1, bubbleProgress * 3); // Fade in 3x faster
+          
+          // Calculate y position (100% to 0%) with a much slower rate
+          // Use a power function to slow down the movement, ensuring it takes the full scroll to reach 0%
+          // The Math.pow creates a curve that moves slower at first and never quite reaches 0 until the very end
+          const yPosition: number = 100 * (1 - Math.pow(bubbleProgress, 0.33));
+          
+          // Apply transformations to the container
+          gsap.set(bubblesContainer, { 
+            opacity: opacity,
+            y: `${yPosition}%`
+          });
+          
+          // Debug log to verify the movement
+          if (bubbleProgress > 0.99) {
+            console.log('Final bubble position:', yPosition);
+          }
+        } else {
+          // Keep bubbles hidden before animation starts
+          // Initial position at 100% (bottom of the container)
+          gsap.set(bubblesContainer, { 
+            opacity: 0,
+            y: '100%'
+          });
+        }
+      }
     }
   });
-  
-  console.log('Scroll animations initialized for #scroll with Lottie animation and word-by-word text reveal');
+
+  // Remove the scroll event listener for parallax as we're no longer using parallax
+  console.log('Scroll animations initialized for #scroll with Lottie animation, word-by-word text reveal, and bubble animation after Lottie (parallax removed)');
 }
 
 // Export the function

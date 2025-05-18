@@ -114,13 +114,13 @@ function initScrollAnimation(): void {
           if (index <= charsToReveal) {
             char.style.opacity = '1'; // Full opacity for revealed characters
           } else {
-            char.style.opacity = '0.5'; // Half opacity for unrevealed characters
+            char.style.opacity = '0.2'; // Half opacity for unrevealed characters
           }
         });
       } else if (self.progress < textRevealStart && characters.length > 0) {
         // Reset all characters to half opacity before the reveal starts
         characters.forEach((char: HTMLSpanElement) => {
-          char.style.opacity = '0.5';
+          char.style.opacity = '0.2';
         });
       } else if (self.progress > textRevealEnd && characters.length > 0) {
         // Ensure all characters are fully revealed after the animation completes

@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           fadeOut('#lottie-loader', 0, 0, () => {
              
-            console.log('Loader fade-out complete');
+            console.log('Loader fade-out complete Raimon');
             
             // Enable scrolling after the animation sequence is complete
             document.body.style.overflow = '';
@@ -60,5 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('beforeunload', () => {
       destroyLottieAnimation(myAnimation);
     });
+
   }
 });

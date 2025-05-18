@@ -4,6 +4,7 @@ import { join, sep } from 'path';
 
 // Config output
 const BUILD_DIRECTORY = 'dist';
+// eslint-disable-next-line no-undef
 const PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Config entrypoint files
@@ -87,6 +88,7 @@ function logServedFiles() {
     })
     .filter(Boolean);
 
-  // eslint-disable-next-line no-console
+   
+  // eslint-disable-next-line no-undef
   console.table(filesInfo);
 }

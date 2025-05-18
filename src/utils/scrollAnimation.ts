@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Initializes scroll-based animations for elements within the #scroll container
- * Animates opacity transitions, plays a Lottie animation, and reveals text letter by letter based on scroll
+ * Animates opacity transitions, plays a Lottie animation, and reveals text word by word based on scroll
  */
 function initScrollAnimation(): void {
   // Check if target elements exist
@@ -40,7 +40,7 @@ function initScrollAnimation(): void {
 
   // Set up text reveal animation
   const textElement: HTMLElement | null = document.getElementById('reveal-text');
-  const characters: HTMLSpanElement[] = [];
+  const words: HTMLSpanElement[] = [];
   
   if (textElement) {
     // Get the text content
@@ -49,18 +49,29 @@ function initScrollAnimation(): void {
     // Clear the text element
     textElement.textContent = '';
     
-    // Create a span for each character
-    for (let i = 0; i < text.length; i++) {
-      const charSpan: HTMLSpanElement = document.createElement('span');
-      charSpan.textContent = text[i];
-      charSpan.style.opacity = '0.5'; // Start with 50% opacity
-      charSpan.style.display = 'inline-block'; // Ensure each character can be animated independently
-      charSpan.style.transition = 'opacity 0.1s ease'; // Smooth transition for opacity changes
-      charSpan.classList.add('reveal-char');
-      charSpan.dataset.index = i.toString();
+    // Split the text into words
+    const wordsArray: string[] = text.split(/\s+/);
+    
+    // Create a span for each word
+    for (let i = 0; i < wordsArray.length; i++) {
+      const wordSpan: HTMLSpanElement = document.createElement('span');
+      wordSpan.textContent = wordsArray[i];
+      wordSpan.style.opacity = '0.5'; // Start with 50% opacity
+      wordSpan.style.display = 'inline-block'; // Ensure each word can be animated independently
+      wordSpan.style.transition = 'opacity 0.1s ease'; // Smooth transition for opacity changes
+      wordSpan.classList.add('reveal-word');
+      wordSpan.dataset.index = i.toString();
+      wordSpan.style.marginRight = '0em'; // Add space between words
       
-      textElement.appendChild(charSpan);
-      characters.push(charSpan);
+      textElement.appendChild(wordSpan);
+      words.push(wordSpan);
+      
+      // No need to add space after the last word
+      if (i < wordsArray.length - 1) {
+        // Add space between words
+        const space = document.createTextNode(' ');
+        textElement.appendChild(space);
+      }
     }
   }
 
@@ -103,29 +114,29 @@ function initScrollAnimation(): void {
         gsap.set('[data-scroll-item="2"]', { opacity: 1 });
       }
       
-      // Text reveal animation: letters reveal one by one
-      if (self.progress >= textRevealStart && self.progress <= textRevealEnd && characters.length > 0) {
-        // Calculate how many characters should be revealed
+      // Text reveal animation: words reveal one by one
+      if (self.progress >= textRevealStart && self.progress <= textRevealEnd && words.length > 0) {
+        // Calculate how many words should be revealed
         const textProgress: number = (self.progress - textRevealStart) / (textRevealEnd - textRevealStart);
-        const charsToReveal: number = Math.floor(textProgress * characters.length);
+        const wordsToReveal: number = Math.floor(textProgress * words.length);
         
-        // Reveal characters one by one
-        characters.forEach((char: HTMLSpanElement, index: number) => {
-          if (index <= charsToReveal) {
-            char.style.opacity = '1'; // Full opacity for revealed characters
+        // Reveal words one by one
+        words.forEach((word: HTMLSpanElement, index: number) => {
+          if (index <= wordsToReveal) {
+            word.style.opacity = '1'; // Full opacity for revealed words
           } else {
-            char.style.opacity = '0.2'; // Half opacity for unrevealed characters
+            word.style.opacity = '0.2'; // Low opacity for unrevealed words
           }
         });
-      } else if (self.progress < textRevealStart && characters.length > 0) {
-        // Reset all characters to half opacity before the reveal starts
-        characters.forEach((char: HTMLSpanElement) => {
-          char.style.opacity = '0.2';
+      } else if (self.progress < textRevealStart && words.length > 0) {
+        // Reset all words to low opacity before the reveal starts
+        words.forEach((word: HTMLSpanElement) => {
+          word.style.opacity = '0.2';
         });
-      } else if (self.progress > textRevealEnd && characters.length > 0) {
-        // Ensure all characters are fully revealed after the animation completes
-        characters.forEach((char: HTMLSpanElement) => {
-          char.style.opacity = '1';
+      } else if (self.progress > textRevealEnd && words.length > 0) {
+        // Ensure all words are fully revealed after the animation completes
+        words.forEach((word: HTMLSpanElement) => {
+          word.style.opacity = '1';
         });
       }
       
@@ -174,10 +185,46 @@ function initScrollAnimation(): void {
         // Set to last frame if after the threshold
         lottieAnimation.goToAndStop(lottieAnimation.totalFrames - 1, true);
       }
+
+
+      // After your Lottie animation code, add this new section:
+// Define progress thresholds for the bubbles animation
+const bubblesAnimStart: number = lottieAnimProgress; // Start right after Lottie animation completes
+const bubblesAnimEnd: number = 1.0; // End at the very bottom of the scroll
+
+// Bubbles animation: fade in and move from 50% to 100% y position
+if (self.progress >= bubblesAnimStart && self.progress <= bubblesAnimEnd) {
+  // Map progress from bubblesAnimStart-bubblesAnimEnd to 0-1 for the animation
+  const bubblesProgress: number = (self.progress - bubblesAnimStart) / (bubblesAnimEnd - bubblesAnimStart);
+  
+  // Calculate opacity (0 to 1) - fade in quickly at the beginning
+  const opacity: number = Math.min(1, bubblesProgress * 3); // Fade in 3x faster
+  
+  // Calculate y position (50% to 100%)
+  const yPosition: number = gsap.utils.interpolate(100, 0, bubblesProgress);
+  
+  // Apply transformations
+  gsap.set('#bubbles', { 
+    opacity: opacity,
+    y: `${yPosition}%`
+  });
+} else if (self.progress < bubblesAnimStart) {
+  // Ensure initial state before the animation starts
+  gsap.set('#bubbles', { 
+    opacity: 0,
+    y: '100%'
+  });
+} else {
+  // Ensure final state after the animation completes
+  gsap.set('#bubbles', { 
+    opacity: 1,
+    y: '0%'
+  });
+}
     }
   });
   
-  console.log('Scroll animations initialized for #scroll with Lottie animation and text reveal');
+  console.log('Scroll animations initialized for #scroll with Lottie animation and word-by-word text reveal');
 }
 
 // Export the function

@@ -23071,20 +23071,26 @@
       lottieAnimation.goToAndStop(0, true);
     }
     const textElement = document.getElementById("reveal-text");
-    const characters = [];
+    const words = [];
     if (textElement) {
       const text2 = textElement.textContent?.trim() || "";
       textElement.textContent = "";
-      for (let i = 0; i < text2.length; i++) {
-        const charSpan = document.createElement("span");
-        charSpan.textContent = text2[i];
-        charSpan.style.opacity = "0.5";
-        charSpan.style.display = "inline-block";
-        charSpan.style.transition = "opacity 0.1s ease";
-        charSpan.classList.add("reveal-char");
-        charSpan.dataset.index = i.toString();
-        textElement.appendChild(charSpan);
-        characters.push(charSpan);
+      const wordsArray = text2.split(/\s+/);
+      for (let i = 0; i < wordsArray.length; i++) {
+        const wordSpan = document.createElement("span");
+        wordSpan.textContent = wordsArray[i];
+        wordSpan.style.opacity = "0.5";
+        wordSpan.style.display = "inline-block";
+        wordSpan.style.transition = "opacity 0.1s ease";
+        wordSpan.classList.add("reveal-word");
+        wordSpan.dataset.index = i.toString();
+        wordSpan.style.marginRight = "0em";
+        textElement.appendChild(wordSpan);
+        words.push(wordSpan);
+        if (i < wordsArray.length - 1) {
+          const space = document.createTextNode(" ");
+          textElement.appendChild(space);
+        }
       }
     }
     ScrollTrigger2.create({
@@ -23115,23 +23121,23 @@
         } else {
           gsapWithCSS.set('[data-scroll-item="2"]', { opacity: 1 });
         }
-        if (self2.progress >= textRevealStart && self2.progress <= textRevealEnd && characters.length > 0) {
+        if (self2.progress >= textRevealStart && self2.progress <= textRevealEnd && words.length > 0) {
           const textProgress = (self2.progress - textRevealStart) / (textRevealEnd - textRevealStart);
-          const charsToReveal = Math.floor(textProgress * characters.length);
-          characters.forEach((char, index2) => {
-            if (index2 <= charsToReveal) {
-              char.style.opacity = "1";
+          const wordsToReveal = Math.floor(textProgress * words.length);
+          words.forEach((word, index2) => {
+            if (index2 <= wordsToReveal) {
+              word.style.opacity = "1";
             } else {
-              char.style.opacity = "0.2";
+              word.style.opacity = "0.2";
             }
           });
-        } else if (self2.progress < textRevealStart && characters.length > 0) {
-          characters.forEach((char) => {
-            char.style.opacity = "0.2";
+        } else if (self2.progress < textRevealStart && words.length > 0) {
+          words.forEach((word) => {
+            word.style.opacity = "0.2";
           });
-        } else if (self2.progress > textRevealEnd && characters.length > 0) {
-          characters.forEach((char) => {
-            char.style.opacity = "1";
+        } else if (self2.progress > textRevealEnd && words.length > 0) {
+          words.forEach((word) => {
+            word.style.opacity = "1";
           });
         }
         if (self2.progress >= secondAnimProgress && self2.progress < thirdAnimProgress) {
@@ -23160,9 +23166,30 @@
         } else if (lottieAnimation && self2.progress > lottieAnimProgress) {
           lottieAnimation.goToAndStop(lottieAnimation.totalFrames - 1, true);
         }
+        const bubblesAnimStart = lottieAnimProgress;
+        const bubblesAnimEnd = 1;
+        if (self2.progress >= bubblesAnimStart && self2.progress <= bubblesAnimEnd) {
+          const bubblesProgress = (self2.progress - bubblesAnimStart) / (bubblesAnimEnd - bubblesAnimStart);
+          const opacity = Math.min(1, bubblesProgress * 3);
+          const yPosition = gsapWithCSS.utils.interpolate(100, 0, bubblesProgress);
+          gsapWithCSS.set("#bubbles", {
+            opacity,
+            y: `${yPosition}%`
+          });
+        } else if (self2.progress < bubblesAnimStart) {
+          gsapWithCSS.set("#bubbles", {
+            opacity: 0,
+            y: "100%"
+          });
+        } else {
+          gsapWithCSS.set("#bubbles", {
+            opacity: 1,
+            y: "0%"
+          });
+        }
       }
     });
-    console.log("Scroll animations initialized for #scroll with Lottie animation and text reveal");
+    console.log("Scroll animations initialized for #scroll with Lottie animation and word-by-word text reveal");
   }
 
   // src/utils/fadeAnimations.ts

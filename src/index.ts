@@ -10,7 +10,7 @@ import { loadAndPlayLottie } from './utils/lottieLoader';
 import { destroyLottieAnimation } from './utils/lottiePlayer';
 
 window.scrollTo(0, 0);
-
+// console
 document.addEventListener('DOMContentLoaded', () => {
   window.scrollTo(0, 0);
 

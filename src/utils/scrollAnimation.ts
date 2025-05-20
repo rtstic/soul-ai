@@ -54,16 +54,32 @@ function initScrollAnimation(): void {
   let lottieAnimation: ReturnType<typeof lottie.loadAnimation> | null = null;
   const lottieElement: HTMLElement | null = document.getElementById('section-lottie');
 
-  if (lottieElement) {
-    lottieAnimation = lottie.loadAnimation({
-      container: lottieElement,
-      renderer: 'svg',
-      loop: false,
-      autoplay: false,
-      path: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json'
-    });
-    lottieAnimation.goToAndStop(0, true);
+if (lottieElement) {
+  // Determine device type based on screen width
+  const screenWidth = window.innerWidth;
+  let animationPath = '';
+  
+  // Set path based on device type
+  if (screenWidth <= 480) {
+    // Mobile
+    animationPath = 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd96ba1fe1ee2705911a_Copy%20of%20hm3___.json';
+  } else if (screenWidth <= 768) {
+    // Tablet
+    animationPath = 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cde4480c419a617165f17_Copy%20of%20ht3____.json';
+  } else {
+    // Desktop (default)
+    animationPath = 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json';
   }
+
+  lottieAnimation = lottie.loadAnimation({
+    container: lottieElement,
+    renderer: 'svg',
+    loop: false,
+    autoplay: false,
+    path: animationPath
+  });
+  lottieAnimation.goToAndStop(0, true);
+}
 
   const textElement: HTMLElement | null = document.getElementById('reveal-text');
   const words: HTMLSpanElement[] = [];

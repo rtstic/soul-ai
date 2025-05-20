@@ -23096,12 +23096,21 @@
     let lottieAnimation = null;
     const lottieElement = document.getElementById("section-lottie");
     if (lottieElement) {
+      const screenWidth = window.innerWidth;
+      let animationPath = "";
+      if (screenWidth <= 480) {
+        animationPath = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd96ba1fe1ee2705911a_Copy%20of%20hm3___.json";
+      } else if (screenWidth <= 768) {
+        animationPath = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cde4480c419a617165f17_Copy%20of%20ht3____.json";
+      } else {
+        animationPath = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json";
+      }
       lottieAnimation = import_lottie_web.default.loadAnimation({
         container: lottieElement,
         renderer: "svg",
         loop: false,
         autoplay: false,
-        path: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json"
+        path: animationPath
       });
       lottieAnimation.goToAndStop(0, true);
     }
@@ -23324,8 +23333,37 @@
   document.addEventListener("DOMContentLoaded", () => {
     window.scrollTo(0, 0);
     document.body.style.overflow = "hidden";
-    const loaderLottie = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682725b636da1042ae7797f8_H1_gradient.json";
-    const heroLottie = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/68272532ccd07135e49d65f4_H2.json";
+    const lottieAnimations = {
+      desktop: {
+        loader: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682725b636da1042ae7797f8_H1_gradient.json",
+        hero: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/68272532ccd07135e49d65f4_H2.json"
+        // section: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json'
+      },
+      tablet: {
+        loader: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cde44ea4ee53f16354b92_H1_Gradient%20Optimised%20_Tablet.json",
+        hero: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cde4480c419a617165f17_Copy%20of%20ht3____.json"
+        // section: 'YOUR_TABLET_SECTION_URL_HERE'
+      },
+      mobile: {
+        loader: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd965c72e21b21747905_H1_Gradient%20Optimised%20_Mobile.json",
+        hero: "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd96ba1fe1ee2705911a_Copy%20of%20hm3___.json"
+        // section: 'YOUR_MOBILE_SECTION_URL_HERE'
+      }
+    };
+    function getDeviceType() {
+      const width2 = window.innerWidth;
+      if (width2 <= 767) {
+        return "mobile";
+      } else if (width2 <= 991) {
+        return "tablet";
+      } else {
+        return "desktop";
+      }
+    }
+    const deviceType = getDeviceType();
+    console.log(`Current device type: ${deviceType}`);
+    const loaderLottie = lottieAnimations[deviceType].loader;
+    const heroLottie = lottieAnimations[deviceType].hero;
     const myAnimation = loadAndPlayLottie("lottie-loader", loaderLottie);
     if (myAnimation) {
       myAnimation.addEventListener("complete", () => {
@@ -23338,12 +23376,18 @@
           });
           setTimeout(() => {
             fadeOut("#lottie-loader", 0, 0, () => {
-              console.log("Loader fade-out complete Raimon");
+              console.log("Loader fade-out complete");
               document.body.style.overflow = "";
               initScrollAnimation();
             });
           }, 500);
         });
+      });
+      window.addEventListener("resize", () => {
+        const newDeviceType = getDeviceType();
+        if (newDeviceType !== deviceType) {
+          console.log(`Device type changed to: ${newDeviceType}`);
+        }
       });
       window.addEventListener("beforeunload", () => {
         destroyLottieAnimation(myAnimation);

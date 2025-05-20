@@ -23134,7 +23134,7 @@
     ScrollTrigger2.create({
       trigger: "#scroll",
       start: "top top",
-      end: "bottom bottom",
+      end: () => `${document.getElementById("scroll").offsetHeight}px`,
       markers: false,
       scrub: 0.5,
       onUpdate: (self2) => {

@@ -23134,7 +23134,8 @@
     ScrollTrigger2.create({
       trigger: "#scroll",
       start: "top top",
-      end: () => `${document.getElementById("scroll").offsetHeight}px`,
+      // end: () => `${document.getElementById('scroll')!.offsetHeight}px`,
+      end: "bottom bottom",
       markers: false,
       scrub: 0.5,
       onUpdate: (self2) => {
@@ -23146,19 +23147,22 @@
         const lottieAnimProgress = 0.95;
         const bubbleAnimStart = 0.8;
         if (self2.progress < firstAnimProgress) {
-          const opacity = gsapWithCSS.utils.interpolate(1, 0, self2.progress / firstAnimProgress);
-          gsapWithCSS.set('[data-scroll-item="1"]', { opacity });
+          const ratio = self2.progress / firstAnimProgress;
+          const opacity = gsapWithCSS.utils.interpolate(1, 0, ratio);
+          const scale2 = gsapWithCSS.utils.interpolate(1, 0.8, ratio);
+          gsapWithCSS.set('[data-scroll-item="1"]', { opacity, scale: scale2 });
         } else {
-          gsapWithCSS.set('[data-scroll-item="1"]', { opacity: 0 });
+          gsapWithCSS.set('[data-scroll-item="1"]', { opacity: 0, scale: 0.8 });
         }
         if (self2.progress >= firstAnimProgress && self2.progress < secondAnimProgress) {
           const adjustedProgress = (self2.progress - firstAnimProgress) / (secondAnimProgress - firstAnimProgress);
           const opacity = gsapWithCSS.utils.interpolate(0, 1, adjustedProgress);
-          gsapWithCSS.set('[data-scroll-item="2"]', { opacity });
+          const scale2 = gsapWithCSS.utils.interpolate(0.8, 1, adjustedProgress);
+          gsapWithCSS.set('[data-scroll-item="2"]', { opacity, scale: scale2 });
         } else if (self2.progress < firstAnimProgress) {
-          gsapWithCSS.set('[data-scroll-item="2"]', { opacity: 0 });
+          gsapWithCSS.set('[data-scroll-item="2"]', { opacity: 0, scale: 0.8 });
         } else {
-          gsapWithCSS.set('[data-scroll-item="2"]', { opacity: 1 });
+          gsapWithCSS.set('[data-scroll-item="2"]', { opacity: 1, scale: 1 });
         }
         if (self2.progress >= textRevealStart && self2.progress <= textRevealEnd && words.length > 0) {
           const textProgress = (self2.progress - textRevealStart) / (textRevealEnd - textRevealStart);
@@ -23216,7 +23220,7 @@
         }
       }
     });
-    console.log("Scroll animations initialized for #scroll with improved bubble animation timing.");
+    console.log("Scroll animations initialized for #scroll with improved bubble animation timing and scale effects.");
   }
 
   // src/utils/fadeAnimations.ts
@@ -23322,7 +23326,6 @@
     document.body.style.overflow = "hidden";
     const loaderLottie = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682725b636da1042ae7797f8_H1_gradient.json";
     const heroLottie = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/68272532ccd07135e49d65f4_H2.json";
-    const sectionLottie = "https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json";
     const myAnimation = loadAndPlayLottie("lottie-loader", loaderLottie);
     if (myAnimation) {
       myAnimation.addEventListener("complete", () => {

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loaderLottie = 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682725b636da1042ae7797f8_H1_gradient.json';
   const heroLottie = 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/68272532ccd07135e49d65f4_H2.json';
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const sectionLottie='https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json';
+  // const sectionLottie='https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/6827264cc032f162afebc33f_Copy%20of%20h3______.json';
   
   const myAnimation = loadAndPlayLottie('lottie-loader', loaderLottie);
   

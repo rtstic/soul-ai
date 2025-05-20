@@ -3,7 +3,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import lottie from 'lottie-web';
 
-// Register the ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 function initScrollAnimation(): void {
@@ -101,7 +100,8 @@ function initScrollAnimation(): void {
   ScrollTrigger.create({
     trigger: '#scroll',
     start: 'top top',
-    end:() => `${document.getElementById('scroll')!.offsetHeight}px`,
+    // end: () => `${document.getElementById('scroll')!.offsetHeight}px`,
+    end: 'bottom bottom',
     markers: false,
     scrub: 0.5,
     onUpdate: (self): void => {
@@ -110,28 +110,32 @@ function initScrollAnimation(): void {
       const textRevealStart = secondAnimProgress;
       const textRevealEnd = textRevealStart + 0.3;
       const thirdAnimProgress = 0.75;
-      
-      // CHANGED: Start the bubble animation earlier at 0.8 instead of 0.95
       const lottieAnimProgress = 0.95;
-      const bubbleAnimStart = 0.8;  // This gives 20% of the scroll for the bubble animation
+      const bubbleAnimStart = 0.8;
 
+      // [data-scroll-item="1"] — fade out + scale down
       if (self.progress < firstAnimProgress) {
-        const opacity = gsap.utils.interpolate(1, 0, self.progress / firstAnimProgress);
-        gsap.set('[data-scroll-item="1"]', { opacity });
+        const ratio = self.progress / firstAnimProgress;
+        const opacity = gsap.utils.interpolate(1, 0, ratio);
+        const scale = gsap.utils.interpolate(1, 0.8, ratio);
+        gsap.set('[data-scroll-item="1"]', { opacity, scale });
       } else {
-        gsap.set('[data-scroll-item="1"]', { opacity: 0 });
+        gsap.set('[data-scroll-item="1"]', { opacity: 0, scale: 0.8 });
       }
 
+      // [data-scroll-item="2"] — fade in + scale up
       if (self.progress >= firstAnimProgress && self.progress < secondAnimProgress) {
         const adjustedProgress = (self.progress - firstAnimProgress) / (secondAnimProgress - firstAnimProgress);
         const opacity = gsap.utils.interpolate(0, 1, adjustedProgress);
-        gsap.set('[data-scroll-item="2"]', { opacity });
+        const scale = gsap.utils.interpolate(0.8, 1, adjustedProgress);
+        gsap.set('[data-scroll-item="2"]', { opacity, scale });
       } else if (self.progress < firstAnimProgress) {
-        gsap.set('[data-scroll-item="2"]', { opacity: 0 });
+        gsap.set('[data-scroll-item="2"]', { opacity: 0, scale: 0.8 });
       } else {
-        gsap.set('[data-scroll-item="2"]', { opacity: 1 });
+        gsap.set('[data-scroll-item="2"]', { opacity: 1, scale: 1 });
       }
 
+      // Text reveal animation
       if (self.progress >= textRevealStart && self.progress <= textRevealEnd && words.length > 0) {
         const textProgress = (self.progress - textRevealStart) / (textRevealEnd - textRevealStart);
         const wordsToReveal = Math.floor(textProgress * words.length);
@@ -173,17 +177,11 @@ function initScrollAnimation(): void {
         lottieAnimation.goToAndStop(lottieAnimation.totalFrames - 1, true);
       }
 
-      // MODIFIED: Start the bubble animation earlier to give it more time
       if (bubblesContainer) {
         if (self.progress >= bubbleAnimStart) {
-          // This gives it 20% of the total scroll (from 0.8 to 1.0) instead of just 5%
           const bubbleProgress = (self.progress - bubbleAnimStart) / (1 - bubbleAnimStart);
           const easedProgress = gsap.parseEase('power2.out')(bubbleProgress);
-          
-          // Slower fade-in by using a more gradual opacity curve
           const opacity = gsap.utils.clamp(0, 1, easedProgress * 1.2);
-          
-          // Make the Y position change more gradual
           const yPosition = gsap.utils.interpolate(60, 0, easedProgress);
 
           gsap.set(bubblesContainer, {
@@ -200,7 +198,7 @@ function initScrollAnimation(): void {
     }
   });
 
-  console.log('Scroll animations initialized for #scroll with improved bubble animation timing.');
+  console.log('Scroll animations initialized for #scroll with improved bubble animation timing and scale effects.');
 }
 
 export { initScrollAnimation };

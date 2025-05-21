@@ -76,7 +76,10 @@ if (lottieElement) {
     renderer: 'svg',
     loop: false,
     autoplay: false,
-    path: animationPath
+    path: animationPath,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    },
   });
   lottieAnimation.goToAndStop(0, true);
 }

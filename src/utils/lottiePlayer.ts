@@ -29,6 +29,9 @@ export function playLottieAnimation(
     loop: true,
     autoplay: true,
     path: animationUrl,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'  // Fill container, cropping overflow if necessary
+    },
     ...options
   };
   

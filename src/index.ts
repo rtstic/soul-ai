@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     mobile: {
       loader: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd965c72e21b21747905_H1_Gradient%20Optimised%20_Mobile.json',
-      hero: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd96ba1fe1ee2705911a_Copy%20of%20hm3___.json'
+      hero: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682c68232b594b69e0be5253_Copy%20of%20hm2___.json'
       // section: 'YOUR_MOBILE_SECTION_URL_HERE'
     }
   };

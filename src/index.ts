@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-window.onbeforeunload = function() {
+/*window.onbeforeunload = function() {
   window.scrollTo(0, 0);
 };
 
@@ -105,4 +105,81 @@ document.addEventListener('DOMContentLoaded', () => {
       destroyLottieAnimation(myAnimation);
     });
   }
+});*/
+
+
+
+/* eslint-disable no-console */
+window.onbeforeunload = function() {
+  window.scrollTo(0, 0);
+};
+
+import { initScrollAnimation } from '$utils/scrollAnimation';
+
+import { fadeIn} from './utils/fadeAnimations';
+import { loadAndPlayLottie } from './utils/lottieLoader';
+
+
+window.scrollTo(0, 0);
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.scrollTo(0, 0);
+
+  // Disable scrolling initially
+  document.body.style.overflow = 'hidden';
+
+  // Define Lottie animations for different device types
+  const lottieAnimations = {
+    desktop: {
+      hero: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/68272532ccd07135e49d65f4_H2.json'
+    },
+    tablet: {
+      hero: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cde4480c419a617165f17_Copy%20of%20ht3____.json'
+    },
+    mobile: {
+      hero: 'https://cdn.prod.website-files.com/65b94b2bab54c86c1cd618a8/682cdd96ba1fe1ee2705911a_Copy%20of%20hm3___.json'
+    }
+  };
+
+  // Function to determine device type based on screen width
+  function getDeviceType() {
+    const width = window.innerWidth;
+    if (width <= 767) {
+      return 'mobile';
+    } else if (width <= 991) {
+      return 'tablet';
+    } else {
+      return 'desktop';
+    }
+  }
+
+  // Get current device type
+  const deviceType = getDeviceType();
+  console.log(`Current device type: ${deviceType}`);
+
+  // Get hero Lottie URL for the current device
+  const heroLottie = lottieAnimations[deviceType].hero;
+
+  // Immediately load and play hero animation without fade
+  loadAndPlayLottie('hero-lottie', heroLottie);
+  console.log('Hero lottie loaded and playing immediately');
+
+  // Then fade in the text block
+  fadeIn('#text-block-1', 1.5, 0.1, () => {
+    console.log('Text block fade-in complete');
+
+    // Enable scrolling after text block fade-in
+    document.body.style.overflow = '';
+    initScrollAnimation();
+  });
+
+  // Handle window resize events to update animations if needed
+  window.addEventListener('resize', () => {
+    const newDeviceType = getDeviceType();
+
+    if (newDeviceType !== deviceType) {
+      console.log(`Device type changed to: ${newDeviceType}`);
+      // Add logic here to reload hero animation if necessary
+    }
+  });
 });
